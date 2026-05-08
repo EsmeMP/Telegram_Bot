@@ -5,8 +5,8 @@ name: Daily English Bot
 
 on:
   schedule:
-    # Corre todos los días a las 8:00 AM hora de México (UTC-6 = 14:00 UTC)
-    - cron: '0 14 * * *'
+    # Corre cada hora
+    - cron: '0 * * * *'
 
   # Permite ejecutarlo manualmente desde GitHub Actions
   workflow_dispatch:
