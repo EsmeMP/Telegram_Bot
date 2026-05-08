@@ -1,15 +1,10 @@
-import os
-import requests
-import json
-import random
+import os, requests, random
 from datetime import datetime
 
-# ─── CONFIG ──────────────────────────────────────────────
-TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]   
-CHAT_ID        = os.environ["CHAT_ID"]          
-ANTHROPIC_KEY  = os.environ["ANTHROPIC_KEY"]    
+TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
+CHAT_ID        = os.environ["CHAT_ID"]
+GEMINI_KEY     = os.environ["GEMINI_KEY"]   
 
-# ─── CATEGORÍAS ──────────────────────────────────────────
 CATEGORIES = [
     "everyday conversational English",
     "business and professional English",
@@ -19,16 +14,14 @@ CATEGORIES = [
     "travel and social situations",
 ]
 
-# ─── GENERAR LECCIÓN ──────────────────────────
 def generate_lesson():
     category = random.choice(CATEGORIES)
     today = datetime.now().strftime("%A, %B %d")
 
     prompt = f"""You are an English teacher sending a daily vocabulary lesson via Telegram.
-
 Today is {today}. Category: {category}
 
-Generate a lesson with EXACTLY this format (use these exact emoji and labels):
+Generate a lesson with EXACTLY this format:
 
 📚 *Daily English* — {category}
 
@@ -53,44 +46,25 @@ Generate a lesson with EXACTLY this format (use these exact emoji and labels):
 Answer: ||[the word]||
 
 ─────────────────
-#EnglishDaily #{category.replace(' ', '')}
-
-Keep it practical and useful for a Spanish-speaking learner. Be concise."""
+#EnglishDaily"""
 
     response = requests.post(
-        "https://api.anthropic.com/v1/messages",
-        headers={
-            "x-api-key": ANTHROPIC_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
-        json={
-            "model": "claude-haiku-4-5-20251001",
-            "max_tokens": 600,
-            "messages": [{"role": "user", "content": prompt}],
-        },
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}",
+        json={"contents": [{"parts": [{"text": prompt}]}]},
         timeout=30,
     )
     response.raise_for_status()
     data = response.json()
-    return data["content"][0]["text"]
+    return data["candidates"][0]["content"]["parts"][0]["text"]
 
-# ─── ENVIAR A TELEGRAM ────────────────────────────────────
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "Markdown",
-    }
-    r = requests.post(url, json=payload, timeout=15)
+    r = requests.post(url, json={"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=15)
     r.raise_for_status()
-    print(f"✅ Mensaje enviado. Status: {r.status_code}")
+    print(f"Enviado. Status: {r.status_code}")
 
-# ─── MAIN ─────────────────────────────────────────────────
 if __name__ == "__main__":
-    print("🤖 Generando lección...")
+    print("Generando lección...")
     lesson = generate_lesson()
     print(lesson)
-    print("\n📤 Enviando a Telegram...")
     send_telegram(lesson)
