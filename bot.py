@@ -19,27 +19,18 @@ CATEGORIES = [
 # funcion que arma el prompt, """ -> string multilinea, hace la peticion a Gemini, devuelve el texto de la respuesta"
 def generate_lesson():
     category = random.choice(CATEGORIES)
-    today = datetime.now().strftime("%A, %B %d")
+    prompt = f"""You are an English teacher sending a short daily vocabulary lesson via Telegram.
+Category: {category}
 
-    prompt = f"""You are an English teacher sending a daily vocabulary lesson via Telegram.
-Today is {today}. Category: {category}
-
-Generate a lesson with EXACTLY this format:
+Generate a lesson with EXACTLY this format, no extra text, no intro, no title:
 
 *Word:* [word or phrase]
-*Meaning:* [Palabra en español]
+*Meaning:* [traducción corta al español]
 *Pronunciation:* /[phonetic]/
-*Example 1:*
-[natural sentence using the word]
-
-*Memory tip:*
-[a short mnemonic or trick to remember it]
-
-*Quick quiz:*
-[a fill-in-the-blank sentence where the answer is the word]
-Answer: ||[the word]||
-
-"""
+*Example:* [natural sentence using the word]
+*Tip:* [1 short trick or curiosity to remember it]
+*Quiz:* [fill-in-the-blank sentence]
+Answer: ||[the word]||"""
 
     response = requests.post(
         f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}",
