@@ -1,20 +1,16 @@
-# .github/workflows/daily_english.yml
-
 name: Daily English Bot
 
 on:
   schedule:
-  # corre cada media hora
     - cron: '0 * * * *'
     - cron: '30 * * * *'
-
-
-  # Permite ejecutarlo manualmente desde GitHub Actions
   workflow_dispatch:
 
 jobs:
   send-lesson:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repo
