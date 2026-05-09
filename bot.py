@@ -22,13 +22,13 @@ Category: {category}
 
 Generate a lesson with EXACTLY this format, no extra text, no intro, no title:
 
-*Word:* [word or phrase]
-*Meaning:* [traducción corta al español]
-*Pronunciation:* /[phonetic]/
-*Example:* [natural sentence using the word]
-*Tip:* [1 short trick or curiosity to remember it]
-*Quiz:* [fill-in-the-blank sentence]
-Answer: ||[the word]||"""
+Word: [word or phrase]
+Meaning: [traducción corta al español]
+Pronunciation: /[phonetic]/
+Example: [natural sentence using the word]
+Tip: [1 short trick or curiosity to remember it]
+Quiz: [fill-in-the-blank sentence]
+Answer: [the word]"""
 
     response = requests.post(
         f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_KEY}",
@@ -42,7 +42,7 @@ Answer: ||[the word]||"""
 # funcion que envia el msj a telegram
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    r = requests.post(url, json={"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=15)
+    r = requests.post(url, json={"chat_id": CHAT_ID, "text": text}, timeout=15)
     r.raise_for_status()
     print(f"Enviado. Status: {r.status_code}")
 
